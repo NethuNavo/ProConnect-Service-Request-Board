@@ -228,24 +228,3 @@ npm test
 
 ## Frontend (Vercel)
 
-
-```
-
----
-
-## Backend (Render)
-
-
-
----
-
-# 📌 Environment Variables
-
-## Backend `.env`
-
-```env
-PORT=4000
-MONGO_URI=your_mongodb_uri
-JWT_SECRET=your_secret
-```
-
