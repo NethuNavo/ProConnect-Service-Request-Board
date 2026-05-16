@@ -236,7 +236,7 @@ https://vercel.com
 
 ---
 
-## Backend (Render)
+## Backend (Railway)
 
 ```txt
 https://your-render-api.onrender.com
