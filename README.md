@@ -242,5 +242,5 @@ https://vercel.com
 https://your-render-api.onrender.com
 ```
 
-Deploy using Render:
-https://render.com
+Deploy using Railway:
+https://railway.com
