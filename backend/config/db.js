@@ -1,103 +1,24 @@
-const fs = require('fs');
 const mongoose = require('mongoose');
 
-const isRunningInDocker = () => {
-  try {
-    if (fs.existsSync('/.dockerenv')) return true;
-    if (fs.existsSync('/proc/1/cgroup')) {
-      const cgroup = fs.readFileSync('/proc/1/cgroup', 'utf8');
-      return /docker|kubepods|containerd/.test(cgroup);
-    }
-  } catch (error) {
-    return false;
-  }
-  return false;
-};
-
 const connectDB = async () => {
-  const envCandidates = {
-    MONGO_URI: process.env.MONGO_URI,
-    MONGODB_URI: process.env.MONGODB_URI,
-    DATABASE_URL: process.env.DATABASE_URL,
-    MONGO_URL: process.env.MONGO_URL,
-  };
+  const mongoURI =
+    process.env.MONGO_URI || process.env.MONGODB_URI || process.env.DATABASE_URL;
 
-  let atlasUri;
-  let atlasUriName;
-  for (const [name, val] of Object.entries(envCandidates)) {
-    if (val) {
-      atlasUri = val;
-      atlasUriName = name;
-      break;
-    }
-  }
-
-  const defaultLocalUri = 'mongodb://127.0.0.1:27017/proconnect';
-  let localUri = process.env.MONGO_URI_LOCAL || defaultLocalUri;
-
-  const runningInContainer = isRunningInDocker();
-
-  if (!atlasUri && (process.env.NODE_ENV === 'production' || runningInContainer)) {
-    console.error('No MongoDB connection string found in environment variables.');
-    console.error('Set MONGO_URI, MONGODB_URI, or DATABASE_URL in your production/container environment (e.g., Railway).');
+  if (!mongoURI) {
+    console.error('❌ Mongo URI not found in environment variables');
     process.exit(1);
   }
 
-  if (!atlasUri && !localUri) {
-    throw new Error('MONGO_URI or MONGO_URI_LOCAL is required in environment variables');
+  try {
+    await mongoose.connect(mongoURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('MongoDB connected successfully');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
   }
-
-  const connectOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  };
-
-  const connectLocal = async (uri) => {
-    try {
-      await mongoose.connect(uri, connectOptions);
-      console.log(`MongoDB connected to local database at ${uri}`);
-      return true;
-    } catch (error) {
-      console.error(`MongoDB local connection error for ${uri}:`, error.message);
-      return false;
-    }
-  };
-
-  if (atlasUri) {
-    console.log(`Using ${atlasUriName} for MongoDB connection`);
-    try {
-      await mongoose.connect(atlasUri, connectOptions);
-      console.log('MongoDB connected to Atlas');
-      return;
-    } catch (error) {
-      console.error('MongoDB Atlas connection error:', error.message);
-      if (process.env.NODE_ENV !== 'production' && localUri) {
-        console.log('Atlas connection failed. Trying local MongoDB fallback at', localUri);
-        if (await connectLocal(localUri)) return;
-
-        if (/127\.0\.0\.1/.test(localUri)) {
-          const dockerHostUri = localUri.replace('127.0.0.1', 'host.docker.internal');
-          console.log('Retrying with host.docker.internal for local MongoDB:', dockerHostUri);
-          if (await connectLocal(dockerHostUri)) return;
-        }
-      }
-
-      console.error(
-        'If you are using MongoDB Atlas, ensure your current IP address is whitelisted in Atlas Network Access and the cluster is available.'
-      );
-      return;
-    }
-  }
-
-  if (await connectLocal(localUri)) return;
-
-  if (/127\.0\.0\.1/.test(localUri)) {
-    const dockerHostUri = localUri.replace('127.0.0.1', 'host.docker.internal');
-    console.log('Retrying with host.docker.internal for local MongoDB:', dockerHostUri);
-    if (await connectLocal(dockerHostUri)) return;
-  }
-
-  console.error('MongoDB connection error: failed to connect using configured URIs.');
 };
 
 module.exports = connectDB;
