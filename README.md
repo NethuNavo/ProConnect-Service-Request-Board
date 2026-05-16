@@ -236,11 +236,11 @@ https://vercel.com
 
 ---
 
-## Backend (Railway)
+## Backend (Render)
 
 ```txt
 https://your-render-api.onrender.com
 ```
 
-Deploy using Railway:
-https://railway.com
+Deploy using Render:
+https://render.com
