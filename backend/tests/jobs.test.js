@@ -1,10 +1,21 @@
 const request = require('supertest');
+const bcrypt = require('bcrypt');
 const app = require('../app');
 const JobRequest = require('../models/JobRequest');
+const User = require('../models/User');
 
 let authToken;
 
 beforeAll(async () => {
+  jest.spyOn(User, 'findOne').mockResolvedValue({
+    _id: '6455e38a1b1b3c001134d2ef',
+    email: 'admin@proconnect.test',
+    name: 'ProConnect Admin',
+    role: 'admin',
+    passwordHash: 'fakehash',
+  });
+  jest.spyOn(bcrypt, 'compare').mockResolvedValue(true);
+
   const loginRes = await request(app)
     .post('/api/auth/login')
     .send({ email: 'admin@proconnect.test', password: 'Password123' });
@@ -27,13 +38,28 @@ describe('Jobs API', () => {
     expect(res.body).toEqual([]);
   });
 
-  it('requires auth for creating a job', async () => {
+  it('creates a job without auth', async () => {
+    const createdJob = {
+      _id: '6455e38a1b1b3c001134d2ef',
+      title: 'Test',
+      description: 'Desc',
+      category: 'Plumbing',
+      location: 'Glasgow',
+      contactName: 'John',
+      contactEmail: 'john@test.com',
+      status: 'Open',
+      createdAt: new Date().toISOString(),
+    };
+
+    jest.spyOn(JobRequest, 'create').mockResolvedValue(createdJob);
+
     const res = await request(app)
       .post('/api/jobs')
       .send({ title: 'Test', description: 'Desc', category: 'Plumbing', location: 'Glasgow', contactName: 'John', contactEmail: 'john@test.com' });
 
-    expect(res.status).toBe(401);
-    expect(res.body.message).toMatch(/Authorization token required/);
+    expect(res.status).toBe(201);
+    expect(res.body.title).toBe('Test');
+    expect(res.body.status).toBe('Open');
   });
 
   it('creates a job with a valid JWT', async () => {

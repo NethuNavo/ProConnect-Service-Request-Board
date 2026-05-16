@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { API_BASE } from '../../lib/api';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('admin@proconnect.test');
-  const [password, setPassword] = useState('Password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -61,19 +62,31 @@ export default function LoginPage() {
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="admin@proconnect.test"
+            placeholder="you@company.com"
+            autoComplete="username"
           />
         </div>
 
-        <div className="form-row">
+        <div className="form-row password-input-row">
           <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="Password123"
-          />
+          <div className="password-field">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Your password"
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              className="password-toggle-button"
+              onClick={() => setShowPassword((current) => !current)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
         </div>
 
         {error && <div className="feedback error">{error}</div>}

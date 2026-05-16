@@ -1,71 +1,251 @@
-# ProConnect Service Request Board
+# ProConnect Service Request Board 🚀
 
-A mini service request app built with:
+A modern full-stack mini service marketplace where homeowners can post service requests and tradespeople can manage them efficiently.
 
-- Frontend: Next.js App Router
-- Backend: Node.js + Express
-- Database: MongoDB + Mongoose
-- Styling: Plain CSS
+Built with:
 
-## Setup
+- Next.js (App Router)
+- Node.js + Express
+- MongoDB + Mongoose
+- Plain CSS
 
-### Backend
+---
 
-1. Open `backend` folder
-2. Copy `.env.example` to `.env`
-3. Set `MONGO_URI` to your MongoDB connection string
-4. Install dependencies
-   ```bash
-   npm install
-   ```
-5. Start backend
-   ```bash
-   npm run dev
-   ```
+## ✨ Features
 
-### Frontend
+- Create new service requests
+- Browse all job requests
+- Filter by category & status
+- View full job details
+- Update job status
+- Delete job requests
+- JWT-based admin authentication
+- RESTful API architecture
+- MongoDB database integration
+- Responsive clean UI
+- Seed script with sample data
+- API testing with Jest
 
-1. Open `frontend` folder
-2. Copy `.env.example` to `.env.local`
-3. Install dependencies
-   ```bash
-   npm install
-   ```
-4. Start frontend
-   ```bash
-   npm run dev
-   ```
+---
 
-## Database seed (optional)
+# 📸 Preview
 
-From `backend`:
+### Home Page
+- View all service requests
+- Filter by category/status
+- Search jobs easily
+
+### New Request Form
+- Submit service requests publicly
+- Client-side validation included
+
+### Job Detail Page
+- View complete request details
+- Update status
+- Delete requests (admin only)
+
+---
+
+# 🛠 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js |
+| Backend | Express.js |
+| Database | MongoDB |
+| ODM | Mongoose |
+| Authentication | JWT |
+| Styling | CSS |
+| Testing | Jest + Supertest |
+
+---
+
+# 📂 Project Structure
+
+```bash
+proconnect/
+│
+├── backend/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── tests/
+│   ├── seed.js
+│   └── server.js
+│
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   ├── styles/
+│   └── services/
+│
+└── README.md
+```
+
+---
+
+# ⚙️ Installation & Setup
+
+## 1️⃣ Clone Repository
+
+```bash
+git clone <your-github-repo-url>
+cd proconnect
+```
+
+---
+
+# 🔧 Backend Setup
+
+Open the `backend` folder:
+
+```bash
+cd backend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create `.env` file:
+
+```env
+PORT=4000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+```
+
+Run backend server:
+
+```bash
+npm run dev
+```
+
+✅ Backend running on:
+
+```bash
+http://localhost:4000
+```
+
+---
+
+# 🎨 Frontend Setup
+
+Open the `frontend` folder:
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create `.env.local` file:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4000/api
+```
+
+Run frontend:
+
+```bash
+npm run dev
+```
+
+✅ Frontend running on:
+
+```bash
+http://localhost:3000
+```
+
+---
+
+# 🌱 Seed Database (Optional)
+
+From `backend` folder:
 
 ```bash
 npm run seed
 ```
 
-## Authentication
+This inserts sample service requests into MongoDB.
 
-A simple JWT login is available for protected actions.
+---
 
-- Login page: http://localhost:3000/login
-- Use the demo credentials:
-  - Email: `admin@proconnect.test`
-  - Password: `Password123`
+# 🔐 Authentication
 
-Only logged-in users can create new requests and delete requests.
+Simple JWT authentication is implemented for admin actions.
 
-## Testing
+## Demo Admin Credentials
 
-Backend tests are included and use an in-memory MongoDB instance.
+```txt
+Email: admin@proconnect.test
+Password: Password123
+```
 
-From `backend`:
+### Permissions
+
+| Action | Access |
+|---|---|
+| Create Job | Public |
+| View Jobs | Public |
+| Update Status | Admin Only |
+| Delete Job | Admin Only |
+
+---
+
+# 🧪 API Testing
+
+Backend tests use in-memory MongoDB.
+
+Run tests:
 
 ```bash
 npm test
 ```
 
-## Local URLs
+---
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:4000/api/jobs
+# 📡 API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/jobs` | Get all jobs |
+| GET | `/api/jobs/:id` | Get single job |
+| POST | `/api/jobs` | Create new job |
+| PATCH | `/api/jobs/:id` | Update job status |
+| DELETE | `/api/jobs/:id` | Delete job |
+
+---
+
+# 🌍 Deployment
+
+## Frontend (Vercel)
+
+
+```
+
+---
+
+## Backend (Render)
+
+
+
+---
+
+# 📌 Environment Variables
+
+## Backend `.env`
+
+```env
+PORT=4000
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_secret
+```
+

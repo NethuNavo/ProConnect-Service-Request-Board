@@ -21,12 +21,7 @@ export default function NewJobPage() {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [token, setToken] = useState(null);
   const router = useRouter();
-
-  useEffect(() => {
-    setToken(localStorage.getItem('token'));
-  }, []);
 
   const validate = () => {
     const nextErrors = {};
@@ -62,20 +57,17 @@ export default function NewJobPage() {
         ...form,
         category: form.category === 'Other' ? form.customCategory.trim() : form.category,
       };
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
 
       const response = await fetch(`${API_BASE}/jobs`, {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (!response.ok) {
         const body = await response.json();
         throw new Error(body.message || 'Unable to create request');
       }
+      localStorage.setItem('successMessage', 'New service request created successfully.');
       router.push('/');
     } catch (err) {
       setServerError(err.message || 'Failed to save request');
@@ -99,13 +91,7 @@ export default function NewJobPage() {
         <a href="/" className="button secondary">Back to requests</a>
       </header>
 
-      {!token ? (
-        <div className="card form-card">
-          <p className="feedback error">Please log in before creating a new request.</p>
-          <a href="/login" className="button primary">Go to Login</a>
-        </div>
-      ) : (
-        <form className="card form-card" onSubmit={handleSubmit} noValidate>
+      <form className="card form-card" onSubmit={handleSubmit} noValidate>
         <div className="form-row">
           <label htmlFor="title">Request Title *</label>
           <input id="title" value={form.title} onChange={handleChange('title')} placeholder="e.g., Leaking kitchen tap repair" />

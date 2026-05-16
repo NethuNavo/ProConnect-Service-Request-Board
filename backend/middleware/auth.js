@@ -18,4 +18,17 @@ const requireAuth = (req, res, next) => {
   });
 };
 
-module.exports = { requireAuth };
+const requireRole = (requiredRoles) => {
+  const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) {
+      return res.status(401).json({ message: 'Authorization token required' });
+    }
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Forbidden: insufficient permissions' });
+    }
+    next();
+  };
+};
+
+module.exports = { requireAuth, requireRole };

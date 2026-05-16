@@ -1,8 +1,14 @@
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const bcrypt = require('bcrypt');
 const JobRequest = require('./models/JobRequest');
+const User = require('./models/User');
 
 dotenv.config();
+
+const adminEmail = process.env.ADMIN_EMAIL || 'admin@proconnect.test';
+const adminPassword = process.env.ADMIN_PASSWORD || 'Password123';
+const adminName = process.env.ADMIN_NAME || 'ProConnect Admin';
 
 const sampleJobs = [
   {
@@ -53,6 +59,22 @@ const seed = async () => {
     await connectDB();
     await JobRequest.deleteMany();
     await JobRequest.create(sampleJobs);
+
+    const normalizedEmail = adminEmail.toLowerCase().trim();
+    const existingAdmin = await User.findOne({ email: normalizedEmail });
+    if (!existingAdmin) {
+      const passwordHash = await bcrypt.hash(adminPassword, 10);
+      await User.create({
+        name: adminName,
+        email: normalizedEmail,
+        passwordHash,
+        role: 'admin',
+      });
+      console.log('Admin user seeded successfully');
+    } else {
+      console.log('Admin user already exists');
+    }
+
     console.log('Seed data inserted successfully');
     process.exit(0);
   } catch (error) {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import JobCard from '../components/JobCard';
 import { API_BASE } from '../lib/api';
@@ -15,12 +16,19 @@ export default function HomePage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [token, setToken] = useState(null);
   const [userName, setUserName] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     setToken(localStorage.getItem('token'));
     setUserName(localStorage.getItem('userName') || '');
+    const message = localStorage.getItem('successMessage');
+    if (message) {
+      setSuccessMessage(message);
+      localStorage.removeItem('successMessage');
+    }
   }, []);
 
   const handleLogout = () => {
@@ -28,6 +36,7 @@ export default function HomePage() {
     localStorage.removeItem('userName');
     setToken(null);
     setUserName('');
+    router.push('/');
   };
 
   const queryString = useMemo(() => {
@@ -90,9 +99,12 @@ export default function HomePage() {
             + New Request
           </Link>
           {token ? (
-            <button type="button" className="button secondary" onClick={handleLogout}>
-              Logout{userName ? ` (${userName})` : ''}
-            </button>
+            <>
+              <span className="login-badge">Logged in as {userName || 'Admin'}</span>
+              <button type="button" className="button secondary" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
           ) : (
             <Link href="/login" className="button secondary">
               Login
@@ -134,6 +146,7 @@ export default function HomePage() {
         <div className="count-text">Showing {jobs.length} of {jobs.length}</div>
       </section>
 
+      {successMessage && <div className="feedback success">{successMessage}</div>}
       {error && <div className="feedback error">{error}</div>}
       {loading ? (
         <div className="feedback">Loading jobs…</div>

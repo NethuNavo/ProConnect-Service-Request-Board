@@ -69,9 +69,12 @@ export default function JobDetailPage({ params }) {
     setSaving(true);
     setError('');
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
       const res = await fetch(`${API_BASE}/jobs/${params.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ status: nextStatus }),
       });
       if (!res.ok) {
@@ -122,9 +125,12 @@ export default function JobDetailPage({ params }) {
         contactEmail: form.contactEmail,
         status: form.status,
       };
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
       const res = await fetch(`${API_BASE}/jobs/${params.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload),
       });
       if (!res.ok) {
@@ -218,20 +224,26 @@ export default function JobDetailPage({ params }) {
               <div className="section-title">Manage Request</div>
               <div className="form-row">
                 <label htmlFor="status">Update Status</label>
-                <select id="status" value={job.status} onChange={handleStatusUpdate} disabled={saving}>
+                <select id="status" value={job.status} onChange={handleStatusUpdate} disabled={!token || saving}>
                   {statuses.map((item) => (
                     <option key={item} value={item}>{item}</option>
                   ))}
                 </select>
               </div>
-              <div className="button-row">
-                <button className="button secondary" type="button" onClick={handleEditToggle}>
-                  Edit Request
-                </button>
-                <button className="button danger" type="button" onClick={handleDelete}>
-                  Delete Request
-                </button>
-              </div>
+              {!token ? (
+                <div className="feedback error">
+                  Please <a href="/login" className="link">log in</a> to update, edit, or delete this request.
+                </div>
+              ) : (
+                <div className="button-row">
+                  <button className="button secondary" type="button" onClick={handleEditToggle}>
+                    Edit Request
+                  </button>
+                  <button className="button danger" type="button" onClick={handleDelete}>
+                    Delete Request
+                  </button>
+                </div>
+              )}
             </section>
           </>
         ) : (

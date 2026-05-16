@@ -1,7 +1,7 @@
 const express = require('express');
 const validator = require('validator');
 const JobRequest = require('../models/JobRequest');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -54,7 +54,7 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-router.post('/', requireAuth, async (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
     const {
       title,
@@ -83,7 +83,7 @@ router.post('/', requireAuth, async (req, res, next) => {
   }
 });
 
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const { status } = req.body;
     const updates = Object.keys(req.body);
@@ -111,7 +111,7 @@ router.patch('/:id', async (req, res, next) => {
   }
 });
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const allowedUpdates = ['title', 'description', 'category', 'location', 'contactName', 'contactEmail', 'status'];
     const updates = Object.keys(req.body);
@@ -160,7 +160,7 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-router.delete('/:id', requireAuth, async (req, res, next) => {
+router.delete('/:id', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const job = await JobRequest.findById(req.params.id);
     if (!job) {
