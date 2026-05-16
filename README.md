@@ -44,6 +44,27 @@ From `backend`:
 npm run seed
 ```
 
+## Authentication
+
+A simple JWT login is available for protected actions.
+
+- Login page: http://localhost:3000/login
+- Use the demo credentials:
+  - Email: `admin@proconnect.test`
+  - Password: `Password123`
+
+Only logged-in users can create new requests and delete requests.
+
+## Testing
+
+Backend tests are included and use an in-memory MongoDB instance.
+
+From `backend`:
+
+```bash
+npm test
+```
+
 ## Local URLs
 
 - Frontend: http://localhost:3000

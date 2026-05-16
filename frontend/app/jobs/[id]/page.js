@@ -13,6 +13,7 @@ export default function JobDetailPage({ params }) {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [token, setToken] = useState(null);
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -24,6 +25,10 @@ export default function JobDetailPage({ params }) {
     status: 'Open',
   });
   const router = useRouter();
+
+  useEffect(() => {
+    setToken(localStorage.getItem('token'));
+  }, []);
 
   useEffect(() => {
     const loadJob = async () => {
@@ -149,8 +154,16 @@ export default function JobDetailPage({ params }) {
   const handleDelete = async () => {
     if (!confirm('Delete this request?')) return;
     try {
-      const res = await fetch(`${API_BASE}/jobs/${params.id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Unable to delete request');
+      const headers = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch(`${API_BASE}/jobs/${params.id}`, {
+        method: 'DELETE',
+        headers,
+      });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.message || 'Unable to delete request');
+      }
       router.push('/');
     } catch (err) {
       setError(err.message || 'Delete failed');

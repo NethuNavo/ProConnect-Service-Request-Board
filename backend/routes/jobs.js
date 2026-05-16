@@ -1,6 +1,7 @@
 const express = require('express');
 const validator = require('validator');
 const JobRequest = require('../models/JobRequest');
+const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -53,7 +54,7 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/', requireAuth, async (req, res, next) => {
   try {
     const {
       title,
@@ -159,7 +160,7 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', requireAuth, async (req, res, next) => {
   try {
     const job = await JobRequest.findById(req.params.id);
     if (!job) {

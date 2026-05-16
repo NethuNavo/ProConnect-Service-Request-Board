@@ -15,6 +15,20 @@ export default function HomePage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [token, setToken] = useState(null);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    setToken(localStorage.getItem('token'));
+    setUserName(localStorage.getItem('userName') || '');
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userName');
+    setToken(null);
+    setUserName('');
+  };
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
@@ -71,9 +85,20 @@ export default function HomePage() {
           </div>
           <p className="subtitle">Browse and manage service requests from homeowners.</p>
         </div>
-        <Link href="/new-job" className="button primary">
-          + New Request
-        </Link>
+        <div className="button-group">
+          <Link href="/new-job" className="button primary">
+            + New Request
+          </Link>
+          {token ? (
+            <button type="button" className="button secondary" onClick={handleLogout}>
+              Logout{userName ? ` (${userName})` : ''}
+            </button>
+          ) : (
+            <Link href="/login" className="button secondary">
+              Login
+            </Link>
+          )}
+        </div>
       </header>
 
       <section className="filter-panel">
