@@ -226,5 +226,5 @@ npm test
 
 # 🌍 Deployment
 
-## Frontend (Vercel)
+## Frontend (Vercel) : https://pro-connect-service-request-board.vercel.app/
 
