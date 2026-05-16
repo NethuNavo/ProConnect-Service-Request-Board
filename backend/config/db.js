@@ -23,14 +23,20 @@ const connectDB = async () => {
     throw new Error('MONGO_URI or MONGO_URI_LOCAL is required in environment variables');
   }
 
-  if (isRunningInDocker() && /127\.0\.0\.1/.test(localUri)) {
-    localUri = localUri.replace('127.0.0.1', 'host.docker.internal');
-    console.log('Docker container detected. Using host.docker.internal for local MongoDB:', localUri);
-  }
-
   const connectOptions = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+  };
+
+  const connectLocal = async (uri) => {
+    try {
+      await mongoose.connect(uri, connectOptions);
+      console.log(`MongoDB connected to local database at ${uri}`);
+      return true;
+    } catch (error) {
+      console.error(`MongoDB local connection error for ${uri}:`, error.message);
+      return false;
+    }
   };
 
   if (atlasUri) {
@@ -42,12 +48,12 @@ const connectDB = async () => {
       console.error('MongoDB Atlas connection error:', error.message);
       if (process.env.NODE_ENV !== 'production' && localUri) {
         console.log('Atlas connection failed. Trying local MongoDB fallback at', localUri);
-        try {
-          await mongoose.connect(localUri, connectOptions);
-          console.log('MongoDB connected to local fallback');
-          return;
-        } catch (fallbackError) {
-          console.error('Local MongoDB fallback failed:', fallbackError.message);
+        if (await connectLocal(localUri)) return;
+
+        if (/127\.0\.0\.1/.test(localUri)) {
+          const dockerHostUri = localUri.replace('127.0.0.1', 'host.docker.internal');
+          console.log('Retrying with host.docker.internal for local MongoDB:', dockerHostUri);
+          if (await connectLocal(dockerHostUri)) return;
         }
       }
 
@@ -58,12 +64,15 @@ const connectDB = async () => {
     }
   }
 
-  try {
-    await mongoose.connect(localUri, connectOptions);
-    console.log('MongoDB connected to local database');
-  } catch (error) {
-    console.error('MongoDB connection error:', error.message);
+  if (await connectLocal(localUri)) return;
+
+  if (/127\.0\.0\.1/.test(localUri)) {
+    const dockerHostUri = localUri.replace('127.0.0.1', 'host.docker.internal');
+    console.log('Retrying with host.docker.internal for local MongoDB:', dockerHostUri);
+    if (await connectLocal(dockerHostUri)) return;
   }
+
+  console.error('MongoDB connection error: failed to connect using configured URIs.');
 };
 
 module.exports = connectDB;
