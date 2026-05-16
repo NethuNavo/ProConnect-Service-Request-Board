@@ -15,9 +15,30 @@ const isRunningInDocker = () => {
 };
 
 const connectDB = async () => {
-  const atlasUri = process.env.MONGO_URI || process.env.MONGODB_URI || process.env.DATABASE_URL || process.env.MONGO_URL;
+  const envCandidates = {
+    MONGO_URI: process.env.MONGO_URI,
+    MONGODB_URI: process.env.MONGODB_URI,
+    DATABASE_URL: process.env.DATABASE_URL,
+    MONGO_URL: process.env.MONGO_URL,
+  };
+
+  let atlasUri;
+  let atlasUriName;
+  for (const [name, val] of Object.entries(envCandidates)) {
+    if (val) {
+      atlasUri = val;
+      atlasUriName = name;
+      break;
+    }
+  }
+
   const defaultLocalUri = 'mongodb://127.0.0.1:27017/proconnect';
   let localUri = process.env.MONGO_URI_LOCAL || defaultLocalUri;
+
+  if (!atlasUri && process.env.NODE_ENV === 'production') {
+    console.error('No MongoDB connection string found in environment variables.\nSet MONGO_URI, MONGODB_URI, or DATABASE_URL in your production environment.');
+    process.exit(1);
+  }
 
   if (!atlasUri && !localUri) {
     throw new Error('MONGO_URI or MONGO_URI_LOCAL is required in environment variables');
@@ -40,6 +61,7 @@ const connectDB = async () => {
   };
 
   if (atlasUri) {
+    console.log(`Using ${atlasUriName} for MongoDB connection`);
     try {
       await mongoose.connect(atlasUri, connectOptions);
       console.log('MongoDB connected to Atlas');

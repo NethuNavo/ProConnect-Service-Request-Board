@@ -16,3 +16,14 @@ const port = process.env.PORT || 4000;
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+// Graceful error handling for unexpected crashes
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason);
+  process.exit(1);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1);
+});
