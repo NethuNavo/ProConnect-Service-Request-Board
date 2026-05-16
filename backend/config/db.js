@@ -15,7 +15,7 @@ const isRunningInDocker = () => {
 };
 
 const connectDB = async () => {
-  const atlasUri = process.env.MONGO_URI;
+  const atlasUri = process.env.MONGO_URI || process.env.MONGODB_URI || process.env.DATABASE_URL || process.env.MONGO_URL;
   const defaultLocalUri = 'mongodb://127.0.0.1:27017/proconnect';
   let localUri = process.env.MONGO_URI_LOCAL || defaultLocalUri;
 
