@@ -35,8 +35,11 @@ const connectDB = async () => {
   const defaultLocalUri = 'mongodb://127.0.0.1:27017/proconnect';
   let localUri = process.env.MONGO_URI_LOCAL || defaultLocalUri;
 
-  if (!atlasUri && process.env.NODE_ENV === 'production') {
-    console.error('No MongoDB connection string found in environment variables.\nSet MONGO_URI, MONGODB_URI, or DATABASE_URL in your production environment.');
+  const runningInContainer = isRunningInDocker();
+
+  if (!atlasUri && (process.env.NODE_ENV === 'production' || runningInContainer)) {
+    console.error('No MongoDB connection string found in environment variables.');
+    console.error('Set MONGO_URI, MONGODB_URI, or DATABASE_URL in your production/container environment (e.g., Railway).');
     process.exit(1);
   }
 
