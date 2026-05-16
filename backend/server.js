@@ -12,9 +12,9 @@ app.get("/", (req, res) => {
   res.send("ProConnect Backend Running Successfully");
 });
 
-const port = process.env.PORT || 4000;
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+const port = process.env.PORT || 8080;
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on port ${port}`);
 });
 
 // Graceful error handling for unexpected crashes
