@@ -234,13 +234,3 @@ https://pro-connect-service-request-board.vercel.app/
 Deploy using Vercel:
 https://vercel.com
 
----
-
-## Backend (Render)
-
-```txt
-https://your-render-api.onrender.com
-```
-
-Deploy using Render:
-https://render.com
